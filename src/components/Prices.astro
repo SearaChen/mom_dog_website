@@ -1,0 +1,85 @@
+---
+// Price table. Prices come from a Google Sheet the owner edits herself
+// (columns: Service | Price | Details). Visitors' browsers read the sheet, so
+// changes show up right away, with no rebuild. Until a sheet is connected
+// (site.pricesSheetId), src/data/prices.csv is shown instead.
+// Laid out like a printed price list: service on the left, a dotted line, price on the right.
+import Section from './Section.astro';
+import { site } from '../site';
+import { priceRows } from '../lib/csv';
+import defaultPrices from '../data/prices.csv?raw';
+
+const rows = priceRows(defaultPrices);
+const cls = {
+  row: 'py-4',
+  line: 'flex items-baseline gap-3',
+  service: 'text-[1.25rem] font-bold',
+  dots: 'min-w-6 flex-1 border-b-2 border-dotted border-brown/35',
+  price: 'text-[1.25rem] font-bold whitespace-nowrap text-accent-dark',
+  details: 'mt-1 text-brown-soft',
+};
+---
+
+<Section id="prices" title="Prices" lead="Prices are per dog, in Canadian dollars. Just ask about rates for extra dogs or holidays." alt>
+  <div id="price-table" data-sheet-id={site.pricesSheetId} class="max-w-[36rem]">
+    <ul data-rows>
+      {rows.map((row) => (
+        <li class={cls.row}>
+          <div class={cls.line}>
+            <strong class={cls.service}>{row.service}</strong>
+            <span class={cls.dots} aria-hidden="true"></span>
+            <span class={cls.price}>{row.price}</span>
+          </div>
+          {row.details && <p class={cls.details}>{row.details}</p>}
+        </li>
+      ))}
+    </ul>
+    <p data-status role="status" class="text-brown-soft empty:hidden"></p>
+  </div>
+  <template id="price-row">
+    <li class={cls.row}>
+      <div class={cls.line}>
+        <strong class={cls.service}></strong>
+        <span class={cls.dots} aria-hidden="true"></span>
+        <span class={cls.price} data-price></span>
+      </div>
+      <p class={cls.details}></p>
+    </li>
+  </template>
+</Section>
+
+<script>
+  import { priceRows } from '../lib/csv';
+
+  const root = document.getElementById('price-table');
+  const sheetId = root?.dataset.sheetId;
+  if (root && sheetId) loadPrices(root, sheetId);
+
+  async function loadPrices(root: HTMLElement, sheetId: string) {
+    const body = root.querySelector('[data-rows]')!;
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const template = document.getElementById('price-row') as HTMLTemplateElement;
+    body.innerHTML = '';
+    status.textContent = 'Loading prices…';
+
+    try {
+      const response = await fetch(`https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`);
+      if (!response.ok) throw new Error(`Google Sheets returned ${response.status}`);
+
+      for (const row of priceRows(await response.text())) {
+        // textContent (not innerHTML) so sheet text can never inject markup.
+        const item = template.content.cloneNode(true) as DocumentFragment;
+        item.querySelector('strong')!.textContent = row.service;
+        item.querySelector('[data-price]')!.textContent = row.price;
+        const details = item.querySelector('p')!;
+        if (row.details) details.textContent = row.details;
+        else details.remove();
+        body.append(item);
+      }
+      status.textContent = '';
+    } catch (error) {
+      console.error(error);
+      status.textContent = "Prices couldn't load right now. Please get in touch and I'll send them over.";
+    }
+  }
+</script>

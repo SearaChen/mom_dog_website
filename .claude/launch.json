@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "preview",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": [
+        "-c",
+        "cd /private/tmp/claude-501/-Users-seara--claude-spares-spare-LkkpUd/312a5a2a-32b5-433f-99fc-43de26fbde2c/scratchpad/dist && exec python3 -m http.server 4323"
+      ],
+      "port": 4323
+    }
+  ]
+}

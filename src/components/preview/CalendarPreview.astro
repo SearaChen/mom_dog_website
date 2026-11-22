@@ -1,0 +1,67 @@
+---
+// EXAMPLE ONLY: a pretend calendar, so people can see what the real one will look like.
+// It shows only while the Google Calendar keys are missing (see AvailabilityCalendar.astro),
+// so it disappears by itself once PUBLIC_GOOGLE_CALENDAR_ID and PUBLIC_GOOGLE_API_KEY are set.
+//
+// To delete it for good:
+//   1. Delete this whole folder: src/components/preview/
+//   2. In src/components/AvailabilityCalendar.astro, delete the two lines marked "EXAMPLE".
+//   3. In src/components/InquiryForm.astro, delete the two lines marked "EXAMPLE".
+import { site } from '../../site';
+
+// The month the site was built in, with a few made-up booked days.
+const exampleBooked = [6, 7, 8, 9, 10, 18, 19, 20, 27, 28];
+
+const today = new Date().toLocaleDateString('en-CA', { timeZone: site.timeZone }); // "YYYY-MM-DD"
+const first = new Date(`${today.slice(0, 7)}-01T00:00:00Z`);
+const monthLabel = first.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const daysInMonth = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate();
+
+const cells: (number | null)[] = Array(first.getUTCDay()).fill(null);
+for (let day = 1; day <= daysInMonth; day++) cells.push(day);
+while (cells.length % 7) cells.push(null);
+const weeks = Array.from({ length: cells.length / 7 }, (_, i) => cells.slice(i * 7, i * 7 + 7));
+
+const style = {
+  open: 'bg-green/15 font-bold text-green ring-1 ring-green',
+  booked: 'bg-rose/10 text-rose line-through decoration-2',
+};
+---
+
+<div class="mt-4 rounded-xl bg-paper p-5 shadow-soft sm:p-6" aria-label="Example calendar, not real dates">
+  <p class="mb-4 text-center font-heading italic text-brown-soft">Example only, not real dates</p>
+
+  <div class="flex items-center justify-between">
+    <span class="grid min-h-12 min-w-12 place-items-center rounded-lg border-2 border-brown/20 text-2xl opacity-30" aria-hidden="true">‹</span>
+    <h4 class="font-heading text-[1.375rem] font-semibold">{monthLabel}</h4>
+    <span class="grid min-h-12 min-w-12 place-items-center rounded-lg border-2 border-brown/20 text-2xl opacity-30" aria-hidden="true">›</span>
+  </div>
+
+  <table class="mt-4 w-full table-fixed text-center">
+    <thead>
+      <tr class="text-base text-brown-soft">
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => <th scope="col" class="pb-2 font-semibold">{d}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {weeks.map((week) => (
+        <tr>
+          {week.map((day) => (
+            <td class="p-0.5">
+              {day && (
+                <span class:list={['grid aspect-square place-items-center rounded-md text-lg', exampleBooked.includes(day) ? style.booked : style.open]}>
+                  {day}
+                </span>
+              )}
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <ul class="mt-4 flex justify-center gap-6">
+    <li class="flex items-center gap-2"><span class="size-5 rounded bg-green/15 ring-1 ring-green"></span>Open</li>
+    <li class="flex items-center gap-2"><span class="size-5 rounded bg-rose/10 ring-1 ring-rose/50"></span>Booked</li>
+  </ul>
+</div>

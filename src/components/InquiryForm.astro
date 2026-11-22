@@ -1,0 +1,117 @@
+---
+// Booking request form. Submissions go to Web3Forms, which emails them to the Gmail
+// address the access key was created with. No server of our own needed.
+import { site } from '../site';
+import FormPreview from './preview/FormPreview.astro'; // EXAMPLE: delete this line to remove the example form
+
+const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY;
+---
+
+{accessKey ? (
+  <form
+    id="inquiry-form"
+    action="https://api.web3forms.com/submit"
+    method="POST"
+    class="space-y-5 rounded-xl bg-paper p-5 text-left shadow-soft sm:p-8"
+  >
+    <input type="hidden" name="access_key" value={accessKey} />
+    <input type="hidden" name="subject" value={`New booking request from the ${site.name} website`} />
+    <input type="hidden" name="from_name" value={`${site.name} website`} />
+    {/* Spam trap: real people never see or tick this. */}
+    <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <label class="block font-semibold">
+        Your name <span aria-hidden="true" class="text-rose">*</span>
+        <input name="name" required autocomplete="name" class="field" />
+      </label>
+      <label class="block font-semibold">
+        Email <span aria-hidden="true" class="text-rose">*</span>
+        <input type="email" name="email" required autocomplete="email" class="field" />
+      </label>
+      <label class="block font-semibold">
+        Phone <span class="font-normal text-brown-soft">(optional)</span>
+        <input type="tel" name="phone" autocomplete="tel" class="field" />
+      </label>
+      <label class="block font-semibold">
+        Service
+        <select name="service" class="field">
+          <option>Boarding</option>
+          <option>Daycare</option>
+          <option>House sitting</option>
+          <option>Drop-in visit</option>
+          <option>Dog walking</option>
+          <option>Not sure yet</option>
+        </select>
+      </label>
+      <label class="block font-semibold">
+        Start date
+        <input type="date" name="start_date" class="field" />
+      </label>
+      <label class="block font-semibold">
+        End date
+        <input type="date" name="end_date" class="field" />
+      </label>
+    </div>
+
+    <label class="block font-semibold">
+      Your dog <span aria-hidden="true" class="text-rose">*</span>
+      <span class="block font-normal text-brown-soft">Name, breed, and age</span>
+      <input name="dog" required class="field" />
+    </label>
+
+    <label class="block font-semibold">
+      Anything else I should know?
+      <span class="block font-normal text-brown-soft">Feeding, medication, personality</span>
+      <textarea name="message" rows="4" class="field"></textarea>
+    </label>
+
+    <p class="text-brown-soft"><span aria-hidden="true" class="text-rose">*</span> Required</p>
+
+    <button type="submit" class="btn w-full sm:w-auto">Send booking request</button>
+    <p data-result role="status" class="font-semibold"></p>
+  </form>
+) : (
+  <>
+    <p class="rounded-xl bg-paper p-6 shadow-soft">
+      The online booking form is coming soon. Until then, please call or email me using the details on this page.
+    </p>
+    <FormPreview /> {/* EXAMPLE: delete this line to remove the example form */}
+  </>
+)}
+
+<script>
+  // Send without leaving the page. Without JavaScript the form still posts
+  // normally and Web3Forms shows its own thank-you page.
+  const form = document.getElementById('inquiry-form') as HTMLFormElement | null;
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const result = form.querySelector('[data-result]') as HTMLElement;
+
+    button.disabled = true;
+    button.textContent = 'Sending…';
+    result.textContent = '';
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: new FormData(form),
+      });
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message);
+      form.reset();
+      result.className = 'font-semibold text-green';
+      result.textContent = "Thank you! Your request was sent. You'll get an email reply soon to confirm your dates.";
+    } catch (error) {
+      console.error(error);
+      result.className = 'font-semibold text-rose';
+      result.textContent = "Sorry, that didn't send. Please try again, or call or email instead.";
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Send booking request';
+    }
+  });
+</script>

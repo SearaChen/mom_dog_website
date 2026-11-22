@@ -1,0 +1,136 @@
+---
+// Month calendar showing open and booked days from the owner's dedicated
+// "Boarding availability" Google Calendar. Logic lives in src/lib/bookedDays.ts.
+import { site } from '../site';
+import CalendarPreview from './preview/CalendarPreview.astro'; // EXAMPLE: delete this line to remove the example calendar
+
+const calendarId = import.meta.env.PUBLIC_GOOGLE_CALENDAR_ID;
+const apiKey = import.meta.env.PUBLIC_GOOGLE_API_KEY;
+const monthsAhead = 6;
+---
+
+{calendarId && apiKey ? (
+  <div
+    id="availability-calendar"
+    class="rounded-xl bg-paper p-5 shadow-soft sm:p-6"
+    data-calendar-id={calendarId}
+    data-api-key={apiKey}
+    data-time-zone={site.timeZone}
+    data-months={monthsAhead}
+  >
+    <div class="flex items-center justify-between">
+      <button type="button" data-prev class="min-h-12 min-w-12 rounded-lg border-2 border-brown/20 text-2xl disabled:opacity-30" aria-label="Previous month">‹</button>
+      <h4 data-month-label class="font-heading text-[1.375rem] font-semibold" aria-live="polite"></h4>
+      <button type="button" data-next class="min-h-12 min-w-12 rounded-lg border-2 border-brown/20 text-2xl disabled:opacity-30" aria-label="Next month">›</button>
+    </div>
+
+    <table class="mt-4 w-full table-fixed text-center">
+      <thead>
+        <tr class="text-base text-brown-soft">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => <th scope="col" class="pb-2 font-semibold">{d}</th>)}
+        </tr>
+      </thead>
+      <tbody data-days></tbody>
+    </table>
+
+    <p data-status class="mt-4 text-center text-brown-soft" role="status">Loading availability…</p>
+
+    <ul class="mt-4 flex justify-center gap-6">
+      <li class="flex items-center gap-2"><span class="size-5 rounded bg-green/15 ring-1 ring-green"></span>Open</li>
+      <li class="flex items-center gap-2"><span class="size-5 rounded bg-rose/10 ring-1 ring-rose/50"></span>Booked</li>
+    </ul>
+  </div>
+) : (
+  <>
+    <p class="rounded-xl bg-paper p-6 shadow-soft">
+      The online calendar is coming soon. For now, ask me about your dates and I'll let you know.
+    </p>
+    <CalendarPreview /> {/* EXAMPLE: delete this line to remove the example calendar */}
+  </>
+)}
+
+<script>
+  import { fetchBookedDays, dayKey, addDays } from '../lib/bookedDays';
+
+  const root = document.getElementById('availability-calendar');
+  if (root) setUpCalendar(root);
+
+  async function setUpCalendar(root: HTMLElement) {
+    const { calendarId, apiKey, timeZone, months } = root.dataset as Record<string, string>;
+    const monthCount = Number(months);
+    const today = dayKey(new Date(), timeZone);
+    const firstMonth = today.slice(0, 7); // "YYYY-MM"
+
+    const label = root.querySelector<HTMLElement>('[data-month-label]')!;
+    const body = root.querySelector<HTMLElement>('[data-days]')!;
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const prev = root.querySelector<HTMLButtonElement>('[data-prev]')!;
+    const next = root.querySelector<HTMLButtonElement>('[data-next]')!;
+
+    let offset = 0; // months after the current one
+    let booked: Set<string> | null = null;
+
+    function monthStart(n: number): string {
+      const d = new Date(`${firstMonth}-01T00:00:00Z`);
+      d.setUTCMonth(d.getUTCMonth() + n);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function render() {
+      const start = monthStart(offset);
+      const startDate = new Date(`${start}T00:00:00Z`);
+      label.textContent = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+      prev.disabled = offset === 0;
+      next.disabled = offset === monthCount - 1;
+
+      const cells: string[] = Array(startDate.getUTCDay()).fill('<td></td>');
+      for (let day = start; day.slice(0, 7) === start.slice(0, 7); day = addDays(day, 1)) {
+        cells.push(dayCell(day));
+      }
+      while (cells.length % 7) cells.push('<td></td>');
+
+      const rows = [];
+      for (let i = 0; i < cells.length; i += 7) rows.push(`<tr>${cells.slice(i, i + 7).join('')}</tr>`);
+      body.innerHTML = rows.join('');
+    }
+
+    function dayCell(day: string): string {
+      const date = new Date(`${day}T00:00:00Z`);
+      const number = date.getUTCDate();
+      const name = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' });
+      let state = 'loading';
+      if (day < today) state = 'past';
+      else if (booked) state = booked.has(day) ? 'booked' : 'open';
+
+      const styles: Record<string, string> = {
+        past: 'text-brown/30',
+        loading: 'text-brown-soft',
+        open: 'bg-green/15 font-bold text-green ring-1 ring-green',
+        booked: 'bg-rose/10 text-rose line-through decoration-2',
+      };
+      const words: Record<string, string> = { past: 'past', loading: '', open: 'open', booked: 'booked' };
+      return `<td class="p-0.5"><span class="grid aspect-square place-items-center rounded-md text-lg ${styles[state]}">
+        <span aria-hidden="true">${number}</span><span class="sr-only">${name}${words[state] ? `, ${words[state]}` : ''}</span>
+      </span></td>`;
+    }
+
+    prev.addEventListener('click', () => { offset--; render(); });
+    next.addEventListener('click', () => { offset++; render(); });
+    render();
+
+    try {
+      booked = await fetchBookedDays({
+        calendarId,
+        apiKey,
+        timeZone,
+        from: new Date(`${monthStart(0)}T00:00:00Z`),
+        to: new Date(`${monthStart(monthCount)}T23:59:59Z`),
+      });
+      status.textContent = 'Booked days are crossed out.';
+    } catch (error) {
+      console.error(error);
+      status.textContent = "The calendar couldn't load right now. Send a request and we'll check your dates.";
+    }
+    render();
+  }
+</script>

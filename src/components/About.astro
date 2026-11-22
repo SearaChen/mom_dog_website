@@ -1,0 +1,61 @@
+---
+// Weiping's letter, plus a few snapshots of recent guests from her Rover profile.
+import Snapshot from './Snapshot.astro';
+import { site } from '../site';
+import portrait from '../assets/photos/weiping-with-guest.jpg';
+import napOnBed from '../assets/photos/nap-on-dog-bed.jpg';
+import doodlePortrait from '../assets/photos/doodle-portrait.jpg';
+import stretchedOut from '../assets/photos/stretched-out.jpg';
+
+// TODO: Weiping is asking the dogs' owners if we can use these photos. Remove any photo an owner says no to.
+// To change a photo: put it in src/assets/photos/, import it above, and describe it in `alt`.
+const guests = [
+  { src: napOnBed, alt: 'A curly apricot dog asleep on its back on a brown dog bed', caption: 'Nap time', tilt: 'left' },
+  { src: doodlePortrait, alt: 'A cream-coloured curly dog sitting up and looking at the camera', caption: 'Posing for a photo', tilt: 'right' },
+  { src: stretchedOut, alt: 'A pale yellow dog stretched out flat on a wooden floor', caption: 'Making themselves at home', tilt: 'left' },
+] as const;
+---
+
+<section id="about" aria-labelledby="about-title" class="bg-sand py-16 md:py-24">
+  <div class="mx-auto max-w-6xl px-5">
+    <div class="grid items-start gap-12 md:grid-cols-[16rem_1fr] md:gap-16 lg:grid-cols-[18rem_1fr]">
+      {/* Hidden on phones, where the photo at the top of the page already shows Weiping. */}
+      <Snapshot
+        src={portrait}
+        alt={`${site.ownerName} smiling with a small cream-coloured dog in her arms`}
+        caption={`${site.ownerName}`}
+        tilt="left"
+        ratio="1/1"
+        sizes="(min-width: 768px) 288px, 70vw"
+        class="hidden w-full md:mt-2 md:block"
+      />
+
+      <div class="max-w-[36rem] space-y-5">
+        <h2 id="about-title" class="text-[2rem] md:text-[2.625rem]">A little more about us</h2>
+        <p>
+          For many years I was busy caring for my parents, so having a dog of my own had to wait. Now my days are
+          free, and looking after other people’s dogs makes me very happy.
+        </p>
+        <p>
+          I’m the one caring for your dog day to day, and {site.partnerName} lends a hand. We don’t have a dog of
+          our own, and someone is home all day, so your dog is never left alone for long. It’s a calm, personal
+          stay, without the noise of a busy kennel.
+        </p>
+        <p>
+          Before the first stay, I like to meet you and your dog once or twice, so we can get to know each other.
+          While you’re away, I send photos and updates.
+        </p>
+        <p class="pt-2 font-heading text-[1.75rem] italic leading-tight">{site.ownerName} &amp; {site.partnerName}</p>
+      </div>
+    </div>
+
+    <h3 class="mt-20 text-[1.5rem] md:mt-24">Some of our recent guests</h3>
+    <ul class="mt-8 grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 md:gap-x-10">
+      {guests.map((photo) => (
+        <li>
+          <Snapshot src={photo.src} alt={photo.alt} caption={photo.caption} tilt={photo.tilt} ratio="4/5" />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

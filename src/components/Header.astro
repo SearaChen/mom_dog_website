@@ -1,0 +1,54 @@
+---
+import { site, nav } from '../site';
+---
+
+<header class="sticky top-0 z-20 border-b border-brown/15 bg-cream/95 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
+    <a href="#main" class="leading-tight text-brown no-underline">
+      <span class="block font-heading text-2xl font-semibold">{site.name}</span>
+      <span class="block text-base text-brown-soft">Dog care in {site.town.split(',')[0]}</span>
+    </a>
+
+    {/* A word, not just an icon, so everyone knows what the button does. */}
+    <button
+      id="nav-toggle"
+      type="button"
+      class="flex items-center gap-2 rounded-lg border-2 border-brown/25 px-3 py-2 text-lg font-bold lg:hidden"
+      aria-expanded="false"
+      aria-controls="site-nav"
+    >
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round">
+        <path d="M4 7h16M4 12h16M4 17h16" />
+      </svg>
+      Menu
+    </button>
+
+    <nav
+      id="site-nav"
+      aria-label="Main"
+      class="absolute inset-x-0 top-full hidden flex-col border-b border-brown/15 bg-cream px-5 pb-5 text-lg lg:static lg:flex lg:flex-row lg:items-center lg:gap-6 lg:border-0 lg:bg-transparent lg:p-0 lg:text-[1.0625rem]"
+    >
+      {nav.map((item) => (
+        <a href={item.href} class="border-b border-brown/10 py-3 font-semibold text-brown no-underline hover:text-accent-dark hover:underline lg:border-0 lg:py-2">
+          {item.label}
+        </a>
+      ))}
+      <a href="#booking" class="py-3 font-bold text-accent-dark no-underline hover:underline lg:py-2">Book a stay</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  // Mobile menu: open/close with the button, close after picking a link.
+  const toggle = document.getElementById('nav-toggle')!;
+  const menu = document.getElementById('site-nav')!;
+
+  function setOpen(open: boolean) {
+    menu.classList.toggle('hidden', !open);
+    menu.classList.toggle('flex', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+
+  toggle.addEventListener('click', () => setOpen(menu.classList.contains('hidden')));
+  menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setOpen(false)));
+</script>

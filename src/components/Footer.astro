@@ -1,0 +1,27 @@
+---
+import { site } from '../site';
+---
+
+<footer class="bg-brown py-12 text-sand">
+  <div class="mx-auto grid max-w-6xl gap-8 px-5 md:grid-cols-2">
+    <div>
+      <p class="font-heading text-2xl font-semibold">{site.name}</p>
+      <p class="mt-1">{site.ownerName} and {site.partnerName}, {site.town}</p>
+    </div>
+    <ul class="space-y-1 md:text-right">
+      <li><a class="text-sand" href={`tel:${site.phoneLink}`}>{site.phoneDisplay}</a></li>
+      <li><a class="text-sand" href={`mailto:${site.email}`}>{site.email}</a></li>
+      <li>
+        <a class="text-sand" href={site.roverUrl} target="_blank" rel="noopener">
+          {site.ownerName} on Rover<span class="sr-only"> (opens in a new tab)</span>
+        </a>
+      </li>
+    </ul>
+    <p class="text-base md:col-span-2">© <span id="year">{new Date().getFullYear()}</span> {site.name}</p>
+  </div>
+</footer>
+
+<script>
+  // Keep the year current even if the site hasn't been rebuilt in a while.
+  document.getElementById('year')!.textContent = String(new Date().getFullYear());
+</script>

@@ -1,0 +1,58 @@
+---
+// House rules and practical details, taken from Weiping's Rover profile.
+import Section from './Section.astro';
+import Paw from './Paw.astro';
+
+const groups = [
+  {
+    title: 'Dogs we can host',
+    note: 'For boarding and daycare in our home.',
+    items: [
+      'Dogs up to 100 lbs',
+      'Over 1 year old',
+      'Spayed or neutered',
+      'No females in heat',
+      "One family's dogs at a time",
+    ],
+  },
+  {
+    title: 'Before the first stay',
+    items: [
+      'We meet you and your dog once or twice first, so your dog can get to know us',
+      "We talk through your dog's routine and care plan together",
+      'Cancel up to 3 days before for boarding, drop-ins and walks, or 7 days before for daycare and house sitting',
+    ],
+  },
+  {
+    title: 'Life at our home',
+    items: [
+      'A house with a fenced yard',
+      'Non-smoking, with no other pets and no children',
+      'Someone is home full time',
+      'Potty breaks every 2–4 hours',
+      'Daily walks and play',
+      'Dogs are welcome on the couch, but not on beds',
+      'Oral medication given if needed',
+    ],
+  },
+];
+---
+
+<Section id="good-to-know" title="Good to know" lead="A few simple rules keep every stay calm, safe and happy." alt>
+  <div class="grid gap-12 md:grid-cols-3 md:gap-10 lg:gap-14">
+    {groups.map((group) => (
+      <div class="border-t-2 border-brown/20 pt-6">
+        <h3 class="text-[1.5rem]">{group.title}</h3>
+        {group.note && <p class="mt-1 text-brown-soft">{group.note}</p>}
+        <ul class="mt-4 space-y-3">
+          {group.items.map((item) => (
+            <li class="flex gap-3">
+              <Paw size={14} class="mt-2 shrink-0 text-accent/70" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</Section>

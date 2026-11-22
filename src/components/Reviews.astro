@@ -1,0 +1,91 @@
+---
+// Reviews from Weiping's Rover profile (site.roverUrl).
+// Paste each review's text into `text`, copied exactly as written on Rover
+// (the reviewers have given permission).
+// Separate paragraphs with a blank line. Reviews with empty text aren't shown. Only add real reviews.
+import Section from './Section.astro';
+import { site } from '../site';
+
+const reviews = [
+  {
+    name: 'Christine J.',
+    service: 'Boarding',
+    date: 'July 2026',
+    text: `I highly recommend Weiping for anyone looking for a dog sitter! We booked her for 4 days of overnight boarding, and before committing, she set up a trial meet and greet where she walked my Goldendoodle and asked me lots of questions to learn about him. That thoughtfulness continued throughout the stay.
+
+My dog is very attached to me and can be anxious with new people, but he was completely comfortable with her from the start. She took the time to patiently learn his quirks and habits, followed his routine closely, and asked follow-up questions whenever she wasn't sure about something.
+
+She was also incredibly diligent about sending photos and updates throughout the 4 days, and always responded quickly to messages. It gave me real peace of mind knowing he was in such caring, attentive hands over multiple days away from home. I'd book with her again without hesitation and recommend her to anyone who is looking for a dog sitter!`,
+  },
+  {
+    name: 'Louise A.',
+    service: 'Boarding',
+    date: 'September 2026',
+    text: "Weiping is an amazing dog sitter! She went out of her way to make sure my dog was comfortable and happy during her stay. She sent photos every day and kept me updated as to her appetite etc. I highly recommend Weiping and would definitely book her again 😊",
+  },
+  {
+    name: 'Hannah T.',
+    service: 'House sitting',
+    date: 'August 2026',
+    text: "Weiping was so lovely and attentive towards our dog. She took care of him so well and our dog loved her so much. She sent regular updates and photos while we were away, which reassured us. We will book with her next time our sweet dog needs a dog sitter!",
+  },
+  {
+    name: 'J T.',
+    service: 'Boarding',
+    date: 'August 2026',
+    text: `Weiping took exceptional care of our dog for 6 days, and we couldn't have asked for a better dog sitter. She was incredibly gentle, caring, and always went above and beyond to make sure our dog's needs were met.
+
+While we were away, she regularly sent us photos and videos, which gave us so much peace of mind knowing our dog was happy, safe, and well cared for. She also spent time playing games that our dog loves, keeping her engaged and comfortable.
+
+It's clear that Weiping genuinely loves animals and treats them like her own. I highly recommend her to anyone looking for a trustworthy, compassionate, and reliable dog sitter!
+
+She is the one for our little Mia, her second mommy.
+
+Thanks a lot Weiping for what you have done.`,
+  },
+  {
+    name: 'Riaz P.',
+    service: 'Drop-in visits',
+    date: 'September 2026',
+    text: 'Weiping took amazing care of our dog Tyson. She was very professional, courteous and attentive to Tysons needs. Thank you for the exceptional care',
+  },
+  {
+    name: 'Zaine V.',
+    service: 'Doggy daycare',
+    date: 'July 2026',
+    text: `Amazing care and attention for Smokey. Our dog is a high energy teenager and Weiping was such a great dog sitter.
+
+Nothing but wonderful things to say. We will book again without question. Thank you!`,
+  },
+  { name: 'Nashwa B.', service: 'Drop-in visits', date: 'August 2025', text: '' },
+  { name: 'Sara R.', service: 'Boarding', date: 'July 2026', text: '' },
+  { name: 'Sushma L.', service: 'Doggy daycare', date: 'July 2026', text: '' },
+].filter((review) => review.text);
+---
+
+<Section
+  id="reviews"
+  title="Kind words from families"
+  lead={`From families who have booked with ${site.ownerName} on Rover, in their own words.`}
+>
+  {/* Two flowing columns, so long and short reviews sit together without gaps. */}
+  <div class="gap-14 md:columns-2">
+    {reviews.map((review) => (
+      <figure class="mb-12 break-inside-avoid border-l-4 border-accent/60 pl-6">
+        <blockquote class="space-y-4">
+          {review.text.split(/\n\s*\n/).map((paragraph) => <p>{paragraph}</p>)}
+        </blockquote>
+        <figcaption class="mt-4">
+          <strong class="block font-heading text-[1.25rem] font-semibold">{review.name}</strong>
+          <span class="text-brown-soft">{review.service}, {review.date}</span>
+        </figcaption>
+      </figure>
+    ))}
+  </div>
+
+  <p class="pt-2">
+    <a href={site.roverUrl} target="_blank" rel="noopener" class="font-bold">
+      Read all of {site.ownerName}’s reviews on Rover<span class="sr-only"> (opens in a new tab)</span>
+    </a>
+  </p>
+</Section>

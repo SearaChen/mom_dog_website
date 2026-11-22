@@ -1,0 +1,44 @@
+---
+// A photo shown like a printed snapshot: white border with a short caption below.
+// Photos live in src/assets/photos/. Astro resizes and compresses them automatically.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string; // describe what's in the photo, for people who can't see it
+  caption?: string;
+  tilt?: 'left' | 'right'; // a slight angle on larger screens
+  ratio?: string; // crop, e.g. "4/5" or "4/3"
+  position?: string; // which part to keep when cropping, e.g. "center top"
+  sizes?: string; // roughly how wide the photo is shown, for picking the file size
+  eager?: boolean; // load right away (only for the photo at the top of the page)
+  class?: string;
+}
+
+const {
+  src,
+  alt,
+  caption,
+  tilt,
+  ratio = '4/5',
+  position = 'center',
+  sizes = '(min-width: 768px) 25vw, 50vw',
+  eager = false,
+  class: className,
+} = Astro.props;
+---
+
+<figure class:list={['snapshot', tilt && `tilt-${tilt}`, className]}>
+  <Image
+    src={src}
+    alt={alt}
+    widths={[320, 480, 720, 960]}
+    sizes={sizes}
+    loading={eager ? 'eager' : 'lazy'}
+    fetchpriority={eager ? 'high' : 'auto'}
+    class="block w-full object-cover"
+    style={`aspect-ratio: ${ratio}; object-position: ${position};`}
+  />
+  {caption ? <figcaption>{caption}</figcaption> : <div class="h-2.5 sm:h-3" />}
+</figure>

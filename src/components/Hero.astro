@@ -1,0 +1,79 @@
+---
+// The top of the page: Weiping saying hello, next to a few snapshots,
+// like photos stuck on the fridge.
+import Snapshot from './Snapshot.astro';
+import Paw from './Paw.astro';
+import { site } from '../site';
+import weiping from '../assets/photos/weiping-hugging-doodles.jpg';
+import happyDoodle from '../assets/photos/happy-doodle.jpg';
+import onDeck from '../assets/photos/resting-on-deck.jpg';
+---
+
+<section class="overflow-hidden pt-12 pb-20 md:pt-20 md:pb-28" aria-labelledby="hero-title">
+  {/* Phones: greeting, photos, then the note. Wider screens: greeting and note on the left, photos on the right. */}
+  <div class="mx-auto grid max-w-6xl gap-x-14 gap-y-10 px-5 md:grid-cols-2 md:grid-rows-[auto_1fr] lg:gap-x-20">
+    {/* The greeting, then one plain sentence so visitors know straight away this is dog care. */}
+    <div class="max-w-[34rem] md:self-end">
+      <h1 id="hero-title" class="text-[3rem] font-medium italic md:text-[4.25rem]">Hi, I’m {site.ownerName}.</h1>
+      <p class="mt-4 font-heading text-[1.5rem] leading-snug md:text-[1.75rem]">
+        I look after dogs in {site.town.split(',')[0]}, Ontario, at our home or at yours.
+      </p>
+    </div>
+
+    {/* Photos overlapping like snapshots on the fridge. The small top one is hidden on narrow phones. */}
+    <div class="relative mx-auto w-full max-w-[30rem] pb-20 sm:pb-12 md:col-start-2 md:row-span-2 md:row-start-1 md:self-center md:pb-16">
+      <Snapshot
+        src={weiping}
+        alt={`${site.ownerName} smiling on the couch with a fluffy black and white dog in her arms`}
+        caption="Me, with one of our guests"
+        ratio="4/5"
+        position="center 30%"
+        sizes="(min-width: 768px) 380px, 75vw"
+        eager
+        class="relative ml-auto w-[80%] rotate-[2deg] [&_figcaption]:text-right"
+      />
+      <Snapshot
+        src={onDeck}
+        alt="A red and white dog lying on a wooden deck in the sun"
+        ratio="1/1"
+        sizes="180px"
+        class="absolute top-8 left-0 z-10 hidden w-[36%] -rotate-[5deg] sm:block"
+      />
+      <Snapshot
+        src={happyDoodle}
+        alt="A smiling curly-haired dog looking up at the camera"
+        ratio="1/1"
+        sizes="(min-width: 768px) 200px, 40vw"
+        class="absolute bottom-0 left-[2%] z-10 w-[36%] -rotate-[3deg] sm:left-[8%] sm:w-[42%]"
+      />
+    </div>
+
+    <div class="max-w-[34rem] md:col-start-1 md:row-start-2">
+      <div class="space-y-5 text-[1.3125rem] leading-[1.65]">
+        <p>
+          I live here with my husband {site.partnerName}, and I have loved dogs for decades. We welcome one
+          family’s dogs at a time, so yours gets all of our attention. They can nap on the couch, play in our
+          fenced yard and keep me company around the house.
+        </p>
+        <p>
+          Your dog can stay with us overnight or for the day. If they’re happier at home, I can house sit, drop in
+          or take them for a walk instead.
+        </p>
+        <p>If you’re going away, or your dog just needs a friend for the day, I’d love to meet you both.</p>
+      </div>
+
+      <p class="mt-8 text-brown-soft">
+        You can <a href="#booking">see my open days</a> and send me a note further down, or call me at{' '}
+        <a href={`tel:${site.phoneLink}`} class="whitespace-nowrap">{site.phoneDisplay}</a>.
+      </p>
+
+      {/* A few paw prints wandering off toward the photos. */}
+      <div class="mt-10 flex items-end gap-3 text-sand-deep">
+        <Paw size={20} class="-rotate-[20deg]" />
+        <Paw size={20} class="mb-3 rotate-[10deg]" />
+        <Paw size={20} class="-rotate-[15deg]" />
+        <Paw size={20} class="mb-3 rotate-[15deg]" />
+      </div>
+    </div>
+  </div>
+</section>
