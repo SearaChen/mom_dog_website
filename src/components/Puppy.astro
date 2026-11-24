@@ -1,0 +1,44 @@
+---
+// A little drawn puppy peeking over the top edge of a box, paws hanging over.
+// Put it inside a `relative` wrapper, just before the box. It's decoration only,
+// so screen readers skip it.
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<svg
+  class:list={['pointer-events-none absolute z-10 h-auto', className]}
+  viewBox="0 0 120 64"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    {/* Makes the lines a little wobbly, like they were drawn with a pen. */}
+    <filter id="puppy-pen" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4" result="n" />
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+  <g
+    filter="url(#puppy-pen)"
+    class="stroke-brown"
+    stroke-width="2.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    {/* head */}
+    <path d="M22 62C22 24 98 24 98 62Z" class="fill-fur" />
+    {/* floppy ears */}
+    <path d="M32 34C14 30 8 56 20 64C28 66 32 56 34 46Z" class="fill-fur-dark" />
+    <path d="M88 34C106 30 112 56 100 64C92 66 88 56 86 46Z" class="fill-fur-dark" />
+    {/* paws over the edge */}
+    <path d="M28 63C28 53 46 53 46 63M74 63C74 53 92 53 92 63" class="fill-paper" />
+    <path d="M34 59V62M40 59V62M80 59V62M86 59V62" fill="none" />
+  </g>
+  {/* eyes and nose */}
+  <circle cx="49" cy="44" r="3" class="fill-brown" />
+  <circle cx="71" cy="44" r="3" class="fill-brown" />
+  <ellipse cx="60" cy="52" rx="5.5" ry="4" class="fill-brown" />
+</svg>

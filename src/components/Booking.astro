@@ -2,6 +2,7 @@
 import Section from './Section.astro';
 import AvailabilityCalendar from './AvailabilityCalendar.astro';
 import InquiryForm from './InquiryForm.astro';
+import Puppy from './Puppy.astro';
 import { site } from '../site';
 
 const steps = [
@@ -30,8 +31,9 @@ const steps = [
         or email <a href={`mailto:${site.email}?subject=Booking%20request`}>{site.email}</a>.
       </p>
     </div>
-    <div class="space-y-4">
+    <div class="relative space-y-4">
       <h3 class="text-[1.5rem]">Booking request</h3>
+      <Puppy class="right-5 top-[-0.875rem] w-[120px] sm:right-12 sm:top-[-1.8rem] sm:w-[150px]" />
       <InquiryForm />
     </div>
   </div>

@@ -8,7 +8,7 @@ import walk from '../assets/photos/walk-by-the-field.jpg';
 const groups = [
   {
     title: 'At our home',
-    photo: { src: asleep, alt: 'A curly apricot dog curled up asleep on a dog bed', caption: 'Settled in for the night', position: 'center 60%', tilt: 'left' },
+    photo: { src: asleep, alt: 'A curly apricot dog curled up asleep on a dog bed', caption: 'Settled in for the night', position: 'center 60%', tilt: 'left', asleep: true },
     services: [
       { name: 'Boarding', text: "Overnight stays while you're away. Your dog eats, plays and sleeps as part of the family." },
       { name: 'Doggy daycare', text: "A relaxed day at our place while you're at work or busy." },
@@ -16,7 +16,7 @@ const groups = [
   },
   {
     title: 'At your home',
-    photo: { src: walk, alt: 'A red and white dog on a leash, sniffing the grass beside a path', caption: 'Out for a walk', position: 'center 70%', tilt: 'right' },
+    photo: { src: walk, alt: 'A red and white dog on a leash, sniffing the grass beside a path', caption: 'Out for a walk', position: 'center 70%', tilt: 'right', asleep: false },
     services: [
       { name: 'House sitting', text: 'I stay overnight in your home, so your dog keeps their own bed and routine.' },
       { name: 'Drop-in visits', text: 'I stop by to feed your dog, play with them and let them out while you’re gone.' },
@@ -30,16 +30,32 @@ const groups = [
   <div class="grid gap-16 md:grid-cols-2 md:gap-12 lg:gap-20">
     {groups.map((group) => (
       <div>
-        <Snapshot
-          src={group.photo.src}
-          alt={group.photo.alt}
-          caption={group.photo.caption}
-          tilt={group.photo.tilt}
-          ratio="4/3"
-          position={group.photo.position}
-          sizes="(min-width: 768px) 40vw, 90vw"
-          class="max-w-[30rem]"
-        />
+        <div class="relative max-w-[30rem]">
+          <Snapshot
+            src={group.photo.src}
+            alt={group.photo.alt}
+            caption={group.photo.caption}
+            tilt={group.photo.tilt}
+            ratio="4/3"
+            position={group.photo.position}
+            sizes="(min-width: 768px) 40vw, 90vw"
+          />
+          {/* Little drawn z's above a sleeping dog, in the same brown pen as the puppy. */}
+          {group.photo.asleep && (
+            <svg
+              class="pointer-events-none absolute top-[14%] right-[16%] w-[64px] stroke-brown sm:w-[76px]"
+              viewBox="0 0 80 60"
+              fill="none"
+              stroke-width="3.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M8 44H18L8 56H18M24 22H38L24 38H38M46 2H66L46 22H66" />
+            </svg>
+          )}
+        </div>
         <h3 class="mt-10 text-[1.75rem]">{group.title}</h3>
         <dl class="mt-4 space-y-5">
           {group.services.map((s) => (
